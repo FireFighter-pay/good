@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>2025 소방공무원 초과근무 수당 계산기</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body {
+font-family: '맑은 고딕', sans-serif;
+display: flex;
+flex-direction: column;
+align-items: center;
+margin: 20px;
+background: #f8f9fa;
+}
+
+table {
+width: 100%;
+max-width: 800px;
+margin: 20px auto;
+border-collapse: collapse;
+background: white;
+box-shadow: 0 0 10px rgba(0,0,0,0.1);
+table-layout: fixed;
+}
+
+th, td {
+border: 1px solid #999;
+text-align: center;
+vertical-align: middle;
+padding: 10px;
+}
+
+th {
+background-color: #cce5ff;
+}
+
+.highlight {
+background-color: #ff4c4c;
+color: white;
+font-weight: bold;
+}
+
+/* 입력 박스 레이아웃 수정 */
+input[type="number"] {
+width: 60px;
+height: 22px;
+text-align: center;
+font-size: 1em;
+padding: 5px;
+margin: 0;
+}
+
+input[type="number"]:focus {
+outline: none;
+border: 1px solid #0056b3;
+}
+
+label {
+display: block;
+text-align: center;
+font-size: 1.1em;
+}
+
+.result {
+font-size: 1.3em;
+font-weight: bold;
+color: #333;
+text-align: center;
+padding: 15px 0;
+}
+
+/* 모바일 최적화 */
+@media (max-width: 600px) {
+table {
+width: 100%;
+max-width: none;
+table-layout: auto;
+font-size: 0.85em;
+}
+
+th, td {
+padding: 6px;
+}
+
+input[type="number"] {
+width: 45px;
+height: 18px;
+font-size: 0.9em;
+}
+
+h2 {
+font-size: 1.2em;
+margin: 10px 0;
+}
+
+.result {
+font-size: 1.1em;
+padding: 10px 0;
+}
+}
+</style>
+</head>
+<body>
+<h2>2025년도 소방 초과근무 단가표</h2>
+<table>
+<tr>
+<th>직종</th><th>계급</th><th>시간외(시간당)</th><th>야간(시간당)</th><th>휴일(일당)</th>
+</tr>
+<tr><td rowspan="6">소방</td><td>소방령</td><td>16,386</td><td>5,462</td><td>131,721</td></tr>
+<tr><td>소방경</td><td>14,572</td><td>4,857</td><td>117,137</td></tr>
+<tr><td>소방위</td><td>13,313</td><td>4,438</td><td>107,018</td></tr>
+<tr><td>소방장</td><td>12,497</td><td>4,166</td><td>100,453</td></tr>
+<tr><td>소방교</td><td>11,145</td><td>3,715</td><td>89,589</td></tr>
+<tr><td>소방사</td><td>10,797</td><td>3,599</td><td>86,791</td></tr>
+</table>
+
+<h2>초과근무수당 계산</h2>
+<table>
+<tr>
+<td class="highlight">계급</td>
+<td colspan="5">
+<select id="rank" onchange="calculate()">
+<option value="">선택하세요</option>
+<option value="16386,5462,131721">소방령</option>
+<option value="14572,4857,117137">소방경</option>
+<option value="13313,4438,107018">소방위</option>
+<option value="12497,4166,100453">소방장</option>
+<option value="11145,3715,89589">소방교</option>
+<option value="10797,3599,86791">소방사</option>
+</select>
+</td>
+</tr>
+<tr>
+<td class="highlight">시간외</td>
+<td><label for="hours">시간입력</label><input type="number" id="hours" value="0" min="0" onchange="calculate()"></td>
+<td class="highlight">야간</td>
+<td><label for="night">시간입력</label><input type="number" id="night" value="0" min="0" onchange="calculate()"></td>
+<td class="highlight">휴일</td>
+<td><label for="holiday">휴일입력</label><input type="number" id="holiday" value="0" min="0" onchange="calculate()"></td>
+</tr>
+<tr>
+<td>금액</td>
+<td id="hoursRaw">0</td>
+<td></td>
+<td id="nightRaw">0</td>
+<td></td>
+<td id="holidayRaw">0</td>
+</tr>
+<tr>
+<td>원단위 절삭</td>
+<td id="hoursTotal">0</td>
+<td></td>
+<td id="nightTotal">0</td>
+<td></td>
+<td id="holidayTotal">0</td>
+</tr>
+<tr>
+<td colspan="6" class="result">총 액 : <span id="total">0</span> 원</td>
+</tr>
+</table>
+
+<script>
+function calculate() {
+const rankData = document.getElementById('rank').value.split(',');
+const hours = parseInt(document.getElementById('hours').value) || 0;
+const night = parseInt(document.getElementById('night').value) || 0;
+const holiday = parseInt(document.getElementById('holiday').value) || 0;
+
+if(rankData.length < 3) return;
+
+const [hourRate, nightRate, holidayRate] = rankData.map(Number);
+
+const totalHourRaw = hourRate * hours;
+const totalNightRaw = nightRate * night;
+const totalHolidayRaw = holidayRate * holiday;
+
+const totalHour = Math.floor(totalHourRaw / 10) * 10;
+const totalNight = Math.floor(totalNightRaw / 10) * 10;
+const totalHoliday = Math.floor(totalHolidayRaw / 10) * 10;
+
+const total = totalHour + totalNight + totalHoliday;
+
+document.getElementById('hoursRaw').innerText = totalHourRaw.toLocaleString();
+document.getElementById('nightRaw').innerText = totalNightRaw.toLocaleString();
+document.getElementById('holidayRaw').innerText = totalHolidayRaw.toLocaleString();
+
+document.getElementById('hoursTotal').innerText = totalHour.toLocaleString();
+document.getElementById('nightTotal').innerText = totalNight.toLocaleString();
+document.getElementById('holidayTotal').innerText = totalHoliday.toLocaleString();
+document.getElementById('total').innerText = total.toLocaleString();
+}
+</script>
+</body>
+</html>
